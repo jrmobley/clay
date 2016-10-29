@@ -12,5 +12,5 @@
 
 /tmp/
 /src/js/index.js
-/dist.zip
+# /dist.zip
 /build/
