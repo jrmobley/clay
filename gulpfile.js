@@ -8,11 +8,10 @@ var stringify = require('stringify');
 var del = require('del');
 var inline = require('gulp-inline');
 var htmlmin = require('gulp-htmlmin');
-var sass = require('gulp-sass');
+var sass = require('gulp-sass')(require('sass'));
 var sourceMaps = require('gulp-sourcemaps');
 var autoprefixer = require('gulp-autoprefixer');
 var uglify = require('gulp-uglify');
-var sassify = require('sassify');
 var autoprefixify = require('./src/scripts/vendor/autoprefixify');
 var insert = require('gulp-insert');
 var clayPackage = require('./package.json');
@@ -22,21 +21,12 @@ var sassIncludePaths = [].concat(
   'src/styles'
 );
 
-var sassifyOptions = {
-  base64Encode: false,
-  sourceMap: false,
-  sourceMapEmbed: false,
-  sourceMapContents: false,
-  outputStyle: 'compact',
-  includePaths: sassIncludePaths
-};
-
 var autoprefixerOptions = {
   browsers: ['Android 4', 'iOS 8'],
   cascade: false
 };
 
-var stringifyOptions = ['.html', '.tpl'];
+var stringifyOptions = ['.html', '.tpl', '.scss'];
 var versionMessage = '/* Clay - https://github.com/pebble/clay - Version: ' +
                      clayPackage.version +
                      ' - Build Date: ' + new Date().toISOString() + ' */\n';
@@ -89,7 +79,6 @@ gulp.task('clay', ['inlineHtml'], function() {
   })
     .transform('deamdify')
     .transform(stringify(stringifyOptions))
-    .transform(sassify, sassifyOptions)
     .transform(autoprefixify, autoprefixerOptions)
     .require(require.resolve('./index'), {expose: clayPackage.name})
     .exclude('message_keys')
@@ -107,7 +96,6 @@ gulp.task('dev-js', ['js', 'sass'], function() {
   return browserify('dev/dev.js', { debug: true })
     .transform(stringify(stringifyOptions))
     .transform('deamdify')
-    .transform(sassify, sassifyOptions)
     .transform(autoprefixify, autoprefixerOptions)
     .ignore('message_keys')
     .bundle()
